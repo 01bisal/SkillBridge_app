@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skillbridge/utils/dialog_utils.dart';
 import 'package:skillbridge/utils/user_state.dart';
+import 'package:skillbridge/utils/user_data_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,15 +16,38 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentTime = '';
   String currentDate = '';
 
+  // ✅ Feed posts with VALID image paths
+  final List<Map<String, String>> _feedPosts = [
+    {
+      'name': 'Jane Doe',
+      'role': 'Senior UX Designer at Atlassian',
+      'content': '"I\'m hosting a free workshop on \'Designing for Accessibility\' this Thursday. DM me for the link! 🚀"',
+      'image': 'assets/images/mentor1.jpg',
+    },
+    {
+      'name': 'Michael Chen',
+      'role': 'Software Engineer at Canva',
+      'content': '"Just posted a new video on my channel about mastering React Hooks. Perfect for juniors looking to level up."',
+      'image': 'assets/images/mentor2.jpg',
+    },
+    {
+      'name': 'Sarah Williams',
+      'role': 'Senior Recruiter at Google',
+      'content': '"I\'m looking for 2 talented Frontend Devs for a new project in Sydney. Connect with me if you\'re interested!"',
+      'image': 'assets/images/mentor3.jpg',
+    },
+    {
+      'name': 'SkillBridge Team',
+      'role': 'Official Account',
+      'content': '"We\'ve just released 5 new courses in our Resource Library! Check them out under the Resources tab."',
+      'image': 'assets/images/mentor1.jpg',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
     _updateDateTime();
-    // Debug: Check user state when home loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final isNewUser = context.read<UserState>().isNewUser;
-      print('🏠 HomeScreen loaded: isNewUser = $isNewUser');
-    });
   }
 
   void _updateDateTime() {
@@ -38,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final confirm = await DialogUtils.showStyledLogoutDialog(context);
     if (confirm == true && context.mounted) {
       context.read<UserState>().resetUser();
+      context.read<UserDataProvider>().resetUserData();
       Navigator.pushReplacementNamed(context, '/');
     }
   }
@@ -46,9 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final bool isNewUser = context.watch<UserState>().isNewUser;
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    // Debug
-    print('🏠 Building HomeScreen: isNewUser = $isNewUser');
 
     final String welcomeMessage = isNewUser ? 'Welcome Aboard!' : 'Welcome Back!';
     final String welcomeSubtext = isNewUser
@@ -67,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Status Bar
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -93,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 15),
+                  // Header
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -147,7 +171,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // ✅ CONDITIONAL: Session reminder only for returning users
                       if (!isNewUser)
                         const Text(
                           'Next session: Tomorrow, 3pm with Kim',
@@ -200,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 25),
+                  // Recommended
                   Text(
                     'Recommended for you',
                     style: TextStyle(
@@ -214,15 +238,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        _buildRecommendCard('Profile 1', isDarkMode),
+                        _buildRecommendCard('Profile 1', 'assets/images/mentor1.jpg', isDarkMode),
                         const SizedBox(width: 15),
-                        _buildRecommendCard('Profile 2', isDarkMode),
+                        _buildRecommendCard('Profile 2', 'assets/images/mentor2.jpg', isDarkMode),
                         const SizedBox(width: 15),
-                        _buildRecommendCard('Profile 3', isDarkMode),
+                        _buildRecommendCard('Profile 3', 'assets/images/mentor3.jpg', isDarkMode),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Upcoming Events
                   Container(
                     padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
@@ -250,6 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Latest from network - ✅ WITH IMAGES
                   Text(
                     'Latest from your network',
                     style: TextStyle(
@@ -259,33 +285,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  _buildFeedPost(
-                    name: 'Jane Doe',
-                    role: 'Senior UX Designer at Atlassian',
-                    content: '"I\'m hosting a free workshop on \'Designing for Accessibility\' this Thursday. DM me for the link! 🚀"',
-                    isDarkMode: isDarkMode,
-                  ),
-                  _buildFeedPost(
-                    name: 'Michael Chen',
-                    role: 'Software Engineer at Canva',
-                    content: '"Just posted a new video on my channel about mastering React Hooks. Perfect for juniors looking to level up."',
-                    isDarkMode: isDarkMode,
-                  ),
-                  _buildFeedPost(
-                    name: 'Sarah Williams',
-                    role: 'Senior Recruiter at Google',
-                    content: '"I\'m looking for 2 talented Frontend Devs for a new project in Sydney. Connect with me if you\'re interested!"',
-                    isDarkMode: isDarkMode,
-                  ),
-                  _buildFeedPost(
-                    name: 'SkillBridge Team',
-                    role: 'Official Account',
-                    content: '"We\'ve just released 5 new courses in our Resource Library! Check them out under the Resources tab."',
-                    isDarkMode: isDarkMode,
-                  ),
+                  ..._feedPosts.map((post) {
+                    return _buildFeedPost(
+                      name: post['name']!,
+                      role: post['role']!,
+                      content: post['content']!,
+                      imagePath: post['image']!,
+                      isDarkMode: isDarkMode,
+                    );
+                  }).toList(),
                 ],
               ),
             ),
+            // Floating Logout Button
             Positioned(
               bottom: 90,
               right: 20,
@@ -313,6 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // Bottom Navigation
             Positioned(
               bottom: 0,
               left: 0,
@@ -422,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecommendCard(String name, bool isDarkMode) {
+  Widget _buildRecommendCard(String name, String imagePath, bool isDarkMode) {
     return Container(
       width: 140,
       padding: const EdgeInsets.all(15),
@@ -435,17 +448,28 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             top: 0,
             left: 0,
-            child: Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.person,
-                color: Color(0xFF2B2C6B),
-                size: 16,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                imagePath,
+                width: 30,
+                height: 30,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 30,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Color(0xFF2B2C6B),
+                      size: 16,
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -530,6 +554,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String name,
     required String role,
     required String content,
+    required String imagePath,
     required bool isDarkMode,
   }) {
     return Container(
@@ -551,17 +576,33 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 45,
-                height: 45,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2B2C6B),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 20,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(22.5),
+                child: Image.asset(
+                  imagePath,
+                  width: 45,
+                  height: 45,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 45,
+                      height: 45,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF2B2C6B),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          name.isNotEmpty ? name[0].toUpperCase() : '?',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 12),
