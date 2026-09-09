@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skillbridge/utils/user_state.dart';
+import 'package:skillbridge/utils/user_data_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,7 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // ✅ Set user as RETURNING
         context.read<UserState>().setUserType(false);
-        print('🔵 Login: Set isNewUser = false');
+
+        // ✅ SET DEMO USER DATA for the predefined account
+        context.read<UserDataProvider>().setDemoUser();
+        print('🔵 Login: Set demo user data');
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
