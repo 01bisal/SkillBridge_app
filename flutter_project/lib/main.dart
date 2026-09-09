@@ -95,6 +95,7 @@ class SkillBridgeApp extends StatelessWidget {
           name: '',
           role: '',
           initial: '',
+          imagePath: '',
         ),
         '/settings': (context) => const SettingsScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
