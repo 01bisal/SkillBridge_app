@@ -4,16 +4,20 @@ class MentorProfileScreen extends StatelessWidget {
   final String name;
   final String role;
   final String initial;
+  final String imagePath;
 
   const MentorProfileScreen({
     super.key,
     required this.name,
     required this.role,
     required this.initial,
+    required this.imagePath,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
@@ -24,48 +28,57 @@ class MentorProfileScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height,
-        color: const Color(0xFFEFF1F5),
+        color: Theme.of(context).scaffoldBackgroundColor,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               const SizedBox(height: 20),
-              // Profile Image
-              Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2B2C6B),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    initial,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              // ✅ Profile Image with fallback
+              ClipRRect(
+                borderRadius: BorderRadius.circular(60),
+                child: Image.asset(
+                  imagePath,
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 120,
+                      height: 120,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF2B2C6B),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          initial,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 20),
-              // Name
               Text(
                 name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
-              // Role
               Text(
                 role,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey,
+                  color: isDarkMode ? Colors.white60 : Colors.grey,
                 ),
               ),
               const SizedBox(height: 30),
@@ -73,7 +86,7 @@ class MentorProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -86,29 +99,29 @@ class MentorProfileScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildStatItem('12', 'Mentees'),
+                    _buildStatItem('12', 'Mentees', isDarkMode),
                     _buildDivider(),
-                    _buildStatItem('45', 'Sessions'),
+                    _buildStatItem('45', 'Sessions', isDarkMode),
                     _buildDivider(),
-                    _buildStatItem('4.9', 'Rating'),
+                    _buildStatItem('4.9', 'Rating', isDarkMode),
                   ],
                 ),
               ),
               const SizedBox(height: 30),
               // About Section
-              const Text(
+              Text(
                 'About',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -118,25 +131,25 @@ class MentorProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Text(
+                child: Text(
                   'Experienced professional with 10+ years in the industry. '
                       'Passionate about mentoring and helping others grow in their careers. '
                       'Specializes in career guidance, interview preparation, and skill development.',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.black87,
+                    color: isDarkMode ? Colors.white70 : Colors.black87,
                     height: 1.5,
                   ),
                 ),
               ),
               const SizedBox(height: 30),
               // Expertise
-              const Text(
+              Text(
                 'Expertise',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               const SizedBox(height: 10),
@@ -189,15 +202,15 @@ class MentorProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String number, String label) {
+  Widget _buildStatItem(String number, String label, bool isDarkMode) {
     return Column(
       children: [
         Text(
           number,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         Text(
@@ -215,7 +228,7 @@ class MentorProfileScreen extends StatelessWidget {
     return Container(
       width: 1,
       height: 30,
-      color: const Color(0xFFEEEEEE),
+      color: Colors.grey.withOpacity(0.3),
     );
   }
 
