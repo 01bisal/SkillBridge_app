@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skillbridge/utils/user_state.dart';
+import 'package:skillbridge/utils/user_data_provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -20,6 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
+  // Password strength
   double _passwordStrength = 0.0;
   String _passwordStrengthText = '';
   Color _passwordStrengthColor = Colors.grey;
@@ -94,16 +96,22 @@ class _SignupScreenState extends State<SignupScreen> {
         _isLoading = true;
       });
 
-      // Simulate API call
       await Future.delayed(const Duration(seconds: 2));
 
       setState(() {
         _isLoading = false;
       });
 
-      // ✅ CRITICAL: Set user as NEW before navigating
+      // ✅ SAVE NAME from signup to UserDataProvider
+      final userDataProvider = context.read<UserDataProvider>();
+      userDataProvider.updateUserData(
+        name: _nameController.text.trim(),
+        location: 'Your Location', // Default - will be updated in onboard1
+        skills: 'Your Skills',      // Default - will be updated in onboard2
+      );
+
       context.read<UserState>().setUserType(true);
-      print('✅ Signup: Set isNewUser = true');
+      print('✅ Signup: Saved name = ${_nameController.text.trim()}');
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
