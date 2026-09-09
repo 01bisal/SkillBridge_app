@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skillbridge/utils/user_data_provider.dart';
 
 class Onboard2Screen extends StatefulWidget {
   const Onboard2Screen({super.key});
@@ -16,6 +18,14 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
   final _industryController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // ✅ Load existing skills
+    final userData = context.read<UserDataProvider>();
+    _skillsController.text = userData.skills;
+  }
+
+  @override
   void dispose() {
     _bioController.dispose();
     _universityController.dispose();
@@ -27,54 +37,66 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
+      // ✅ SAVE SKILLS
+      final userData = context.read<UserDataProvider>();
+      userData.updateUserData(
+        name: userData.name,
+        location: userData.location,
+        skills: _skillsController.text.trim(),
+      );
+      print('✅ Onboard2: Saved skills = ${_skillsController.text.trim()}');
+
       Navigator.pushNamed(context, '/onboard3');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          color: Color(0xFF2B2C6B),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1A1A2E) : const Color(0xFF2B2C6B),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
         child: Column(
           children: [
-            // Header with line
             Container(
               padding: const EdgeInsets.only(bottom: 15),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.black, width: 1),
+                  bottom: BorderSide(
+                    color: isDarkMode ? Colors.white24 : Colors.black,
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Profile',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.white : Colors.white,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Step 2 / 3',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.white60 : Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 25),
-            // Scrollable Form Content
             Expanded(
               child: SingleChildScrollView(
                 child: Form(
@@ -84,14 +106,20 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                       _buildFormGroup(
                         label: 'About me *',
                         isRequired: true,
+                        isDarkMode: isDarkMode,
                         child: TextFormField(
                           controller: _bioController,
                           maxLines: 4,
-                          style: const TextStyle(color: Colors.black),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Write a short bio...',
+                            hintStyle: TextStyle(
+                              color: isDarkMode ? Colors.white60 : Colors.grey,
+                            ),
                             filled: true,
-                            fillColor: const Color(0xFFE5E5E5),
+                            fillColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4),
                               borderSide: BorderSide.none,
@@ -120,16 +148,22 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                       _buildFormGroup(
                         label: 'Education *',
                         isRequired: true,
+                        isDarkMode: isDarkMode,
                         child: Column(
                           children: [
                             TextFormField(
                               controller: _universityController,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.black),
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white : Colors.black,
+                              ),
                               decoration: InputDecoration(
                                 hintText: '[University] *',
+                                hintStyle: TextStyle(
+                                  color: isDarkMode ? Colors.white60 : Colors.grey,
+                                ),
                                 filled: true,
-                                fillColor: const Color(0xFFE5E5E5),
+                                fillColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(4),
                                   borderSide: BorderSide.none,
@@ -154,11 +188,16 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                             TextFormField(
                               controller: _degreeController,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.black),
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white : Colors.black,
+                              ),
                               decoration: InputDecoration(
                                 hintText: '[Degree type] *',
+                                hintStyle: TextStyle(
+                                  color: isDarkMode ? Colors.white60 : Colors.grey,
+                                ),
                                 filled: true,
-                                fillColor: const Color(0xFFE5E5E5),
+                                fillColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(4),
                                   borderSide: BorderSide.none,
@@ -186,14 +225,20 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                       _buildFormGroup(
                         label: 'Skills *',
                         isRequired: true,
+                        isDarkMode: isDarkMode,
                         child: TextFormField(
                           controller: _skillsController,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.black),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           decoration: InputDecoration(
                             hintText: '[Search Skills] *',
+                            hintStyle: TextStyle(
+                              color: isDarkMode ? Colors.white60 : Colors.grey,
+                            ),
                             filled: true,
-                            fillColor: const Color(0xFFE5E5E5),
+                            fillColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4),
                               borderSide: BorderSide.none,
@@ -219,14 +264,20 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                       _buildFormGroup(
                         label: 'Industry of Interest *',
                         isRequired: true,
+                        isDarkMode: isDarkMode,
                         child: TextFormField(
                           controller: _industryController,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.black),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Type industry... *',
+                            hintStyle: TextStyle(
+                              color: isDarkMode ? Colors.white60 : Colors.grey,
+                            ),
                             filled: true,
-                            fillColor: const Color(0xFFE5E5E5),
+                            fillColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4),
                               borderSide: BorderSide.none,
@@ -249,18 +300,17 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           '* Required fields',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: isDarkMode ? Colors.white60 : Colors.white70,
                           ),
                         ),
                       ),
                       const SizedBox(height: 30),
-                      // Buttons
                       Row(
                         children: [
                           Expanded(
@@ -269,18 +319,19 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFE5E5E5),
-                                foregroundColor: Colors.black,
+                                backgroundColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
+                                foregroundColor: isDarkMode ? Colors.white : Colors.black,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Back',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                               ),
                             ),
@@ -290,18 +341,19 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
                             child: ElevatedButton(
                               onPressed: _nextStep,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFE5E5E5),
-                                foregroundColor: Colors.black,
+                                backgroundColor: isDarkMode ? const Color(0xFF2D2D44) : const Color(0xFFE5E5E5),
+                                foregroundColor: isDarkMode ? Colors.white : Colors.black,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'NEXT',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                               ),
                             ),
@@ -323,6 +375,7 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
   Widget _buildFormGroup({
     required String label,
     required Widget child,
+    required bool isDarkMode,
     bool isRequired = false,
   }) {
     return Column(
@@ -332,8 +385,8 @@ class _Onboard2ScreenState extends State<Onboard2Screen> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
