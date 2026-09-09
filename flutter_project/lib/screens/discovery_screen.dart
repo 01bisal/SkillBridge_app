@@ -13,31 +13,37 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+  // ✅ Updated mentor data with image paths
   final List<Map<String, String>> _allMentors = [
     {
       'initial': 'J',
       'name': 'Jane Doe',
       'role': 'UX Designer @ Atlassian',
+      'image': 'assets/images/mentor1.jpg',
     },
     {
       'initial': 'M',
       'name': 'Michael Chen',
       'role': 'Dev @ Canva',
+      'image': 'assets/images/mentor2.jpg',
     },
     {
       'initial': 'S',
       'name': 'Sarah Williams',
       'role': 'Recruiter @ Google',
+      'image': 'assets/images/mentor3.jpg',
     },
     {
       'initial': 'R',
       'name': 'Robert Kim',
       'role': 'Data Scientist @ AWS',
+      'image': 'assets/images/mentor4.jpg',
     },
     {
       'initial': 'P',
       'name': 'Priya Patel',
       'role': 'Product Manager @ Atlassian',
+      'image': 'assets/images/mentor5.jpg',
     },
   ];
 
@@ -254,6 +260,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
                         initial: mentor['initial']!,
                         name: mentor['name']!,
                         role: mentor['role']!,
+                        imagePath: mentor['image']!,
                         isDarkMode: isDarkMode,
                         onTap: () {
                           Navigator.push(
@@ -263,6 +270,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
                                 name: mentor['name']!,
                                 role: mentor['role']!,
                                 initial: mentor['initial']!,
+                                imagePath: mentor['image']!,
                               ),
                             ),
                           );
@@ -392,6 +400,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
     required String initial,
     required String name,
     required String role,
+    required String imagePath,
     required bool isDarkMode,
     required VoidCallback onTap,
   }) {
@@ -413,22 +422,34 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: const BoxDecoration(
-                color: Color(0xFF2B2C6B),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  initial,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
+            // ✅ Profile Image with fallback
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Image.asset(
+                imagePath,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 50,
+                    height: 50,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2B2C6B),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        initial,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 15),
